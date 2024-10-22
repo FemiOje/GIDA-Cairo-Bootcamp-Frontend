@@ -1,50 +1,63 @@
 "use client";
-import { useContractRead } from "@starknet-react/core";
+import { useContractRead, useReadContract, useNetwork } from "@starknet-react/core";
 import Balance from "./components/balance";
 import Header from "./components/header";
 import StudentsTable from "./components/students-table";
 import StudentsTableControl from "./components/students-table-control";
 import TotalStudents from "./components/total-students";
-import { dummyStudents } from "./lib/data";
 import { ABI } from "./abis/abi";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { contractAddress } from "./lib/data";
+import Loading from "./components/loading";
+import { felt252ToString } from "./lib/helpers";
+import { shortString } from "starknet";
 
 export default function Home() {
-  // TODO - Fetch Students from Contract
-  const {
-    data: allStudents,
+  const { data,
     isLoading: isLoadingStudents,
+    isSuccess,
     refetch: refetchStudents,
-    isFetching: isFetchingStudents,
+    isFetching: isFetchingStudents
   } = useContractRead({
     functionName: "get_all_students",
     args: [],
     abi: ABI,
-    address: contractAddress,
+    address: contractAddress
   });
 
-  console.log(allStudents);
-  
-  ;
 
   return (
     <div className="py-[60px] px-[100px]">
       <Header />
-      <div className="mt-[60px]">
-        <div className="flex justify-between items-center">
-          {/* TODO: - Pass correct students length */}
-          <TotalStudents total={dummyStudents?.length} />
-          <Balance />
-        </div>
-        {/* TODO: - Pass correct students */}
-        <StudentsTable students={dummyStudents} />
-        {/* TODO: - Pass correct students length */}
-        <StudentsTableControl
-          count={dummyStudents?.length}
-          handleRefreshStudents={() => console.log("Handle refetch")}
-        />
-      </div>
+      {isLoadingStudents ?
+        <Loading message={"Getting all students..."} /> :
+        (
+          <div className="mt-[60px]">
+            <div className="flex justify-between items-center">
+              {isSuccess && <TotalStudents total={data?.length} />}
+              <Balance />
+            </div>
+
+            <StudentsTable
+              students={data?.map((student, i) => {
+                return {
+                  id: i + 1,
+                  is_active: student.is_active,
+                  age: Number(student.age),
+                  fname: felt252ToString(student.fname),
+                  lname: felt252ToString(student.lname),
+                  phone_number: Number(student.phone_number),
+                };
+              })}
+            />
+
+            <StudentsTableControl
+              count={data?.length}
+              handleRefreshStudents={refetchStudents}
+            />
+          </div>
+        )
+      }
     </div>
   );
 }

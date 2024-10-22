@@ -11,28 +11,28 @@ export default function AddressBar({ address }) {
   const disconnectWallet = () => {
     disconnect();
 
-    switch (status) {
-      case "error":
-        console.log("Error occured while trying to disconnect wallet. Try again");
-        break;
+    // switch (status) {
+    //   case "error":
+    //     console.log("Error occured while trying to disconnect wallet. Try again");
+    //     break;
 
-      case "pending":
-        console.log("Trying to disconnect...");
-        break;
+    //   case "pending":
+    //     console.log("Trying to disconnect...");
+    //     break;
 
-      case "success":
-        console.log("Disconnecteed successfully.");
-        break;
+    //   case "success":
+    //     console.log("Disconnecteed successfully.");
+    //     break;
 
-      default:
-        console.log("Unexpected behaviour occured. Please refreesh page.");
-        break;
-    }
+    //   default:
+    //     console.log("Unexpected behaviour occured. Please refreesh page.");
+    //     break;
+    // }
   }
 
   return (
     <div className="relative">
-      <button
+      <div
         role="combobox"
         aria-expanded={showDisconnect}
         aria-controls="disconnect-box"
@@ -47,7 +47,7 @@ export default function AddressBar({ address }) {
         >
           <ChevronDown />
         </span>
-      </button>
+      </div>
       <div
         id="disconnect-box"
         role="listbox"

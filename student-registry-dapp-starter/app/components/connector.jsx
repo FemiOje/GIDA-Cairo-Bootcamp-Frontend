@@ -42,8 +42,6 @@ const Connector = () => {
         <button
           className="py-3 px-6 rounded-2xl bg-[#5B9EF7] text-white text-base leading-5 font-medium"
           onClick={() => {
-            console.log("clicked!!");
-            console.log(isOpen);
             setIsOpen((prev) => !prev);
           }}
         >
