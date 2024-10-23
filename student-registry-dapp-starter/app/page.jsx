@@ -6,11 +6,9 @@ import StudentsTable from "./components/students-table";
 import StudentsTableControl from "./components/students-table-control";
 import TotalStudents from "./components/total-students";
 import { ABI } from "./abis/abi";
-import { useState, useEffect } from "react";
 import { contractAddress } from "./lib/data";
 import Loading from "./components/loading";
 import { felt252ToString } from "./lib/helpers";
-import { shortString } from "starknet";
 
 export default function Home() {
   const { data,
