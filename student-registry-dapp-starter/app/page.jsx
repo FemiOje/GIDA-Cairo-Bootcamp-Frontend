@@ -1,5 +1,5 @@
 "use client";
-import { useContractRead, useReadContract, useNetwork } from "@starknet-react/core";
+import { useContractRead } from "@starknet-react/core";
 import Balance from "./components/balance";
 import Header from "./components/header";
 import StudentsTable from "./components/students-table";

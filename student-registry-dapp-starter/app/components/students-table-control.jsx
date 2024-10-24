@@ -1,20 +1,76 @@
+"use client";
 import RefreshIcon from "../svg/RefreshIcon";
 import Pagination from "./pagination";
 import CloseIcon from "../svg/CloseIcon";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
+import { ABI } from "../abis/abi";
+import { contractAddress } from "../lib/data";
+
+import {
+  useSendTransaction,
+  useContract,
+  useNetwork,
+  useAccount,
+  useContractWrite,
+  useExplorer,
+  useWaitForTransaction,
+} from "@starknet-react/core";
+import { CallData } from "starknet";
+import { HashLoader } from "react-spinners";
+
+
 
 export default function StudentsTableControl({ count, handleRefreshStudents }) {
-  // Form State Values
-  const addStudentPopover = useRef(null);
-  const [surname, setSurname] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [age, setAge] = useState("");
+  const { address: userAddress } = useAccount();
+  const { chain } = useNetwork();
+  const { contract } = useContract({
+    abi: ABI,
+    address: contractAddress,
+  });
+  
+    // Form State Values
+    const addStudentPopover = useRef(null);
+    const [surname, setSurname] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [age, setAge] = useState("");
+  
+  
+    // Submit Event Handler
+    const handleSubmit = async (event) => {
+      event.preventDefault();
+      console.log("surname: ", surname);
+      console.log("firstName: ", firstName);
+      console.log("phoneNumber: ", phoneNumber);
+      console.log("age: ", age);
+      writeAsync();
+    };
 
-  // Submit Event Handler
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-  };
+// Contract Call Array
+const calls = useMemo(() => {
+  const isInputValid =
+    userAddress &&
+    contract &&
+    firstName.length > 0 &&
+    surname.length > 0 &&
+    phoneNumber.length > 0 &&
+    age;
+
+  if (!isInputValid) return [];
+
+  return contract.populateTransaction["add_student"](
+    CallData.compile([firstName, surname, phoneNumber, age, 1])
+  );
+}, [contract, userAddress, firstName, surname, phoneNumber, age]);
+
+const {
+  writeAsync,
+  data: writeData,
+  isPending: writeIsPending,
+} = useContractWrite({
+  calls,
+});
+
 
   //TODO: Contract Initialization
 
@@ -76,7 +132,6 @@ export default function StudentsTableControl({ count, handleRefreshStudents }) {
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">Add Student</h2>
             <button
-              className=""
               onClick={() => addStudentPopover.current?.close()}
             >
               <CloseIcon />
@@ -137,7 +192,7 @@ export default function StudentsTableControl({ count, handleRefreshStudents }) {
           <button
             className="w-full py-3 bg-[#5B9EF7] rounded-2xl text-base flex justify-center items-center leading-6 font-medium text-[#F9F9F9] mt-2 disabled:cursor-not-allowed disabled:bg-opacity-85"
             disabled={!surname || !firstName || !age || !phoneNumber}
-            onClick={handleSubmit}
+            onClick={(e) => handleSubmit(e)}
           >
             {/* {buttonContent()} */}
             Add Student
